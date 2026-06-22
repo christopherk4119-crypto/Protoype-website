@@ -1,12 +1,18 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   Wrench, Zap, Droplets, PaintBucket, Layers, Package, Home, TreePine,
   Phone, Mail, MapPin, Star, CheckCircle, Clock, Shield, ThumbsUp,
   ChevronDown, Menu, X, ArrowRight, ClipboardList, CalendarCheck, Hammer,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { WebGLShader } from '@/components/ui/web-gl-shader';
+import { ContainerScroll } from '@/components/ui/container-scroll-animation';
+import { LiquidButton } from '@/components/ui/liquid-glass-button';
+
+// ── Data ──────────────────────────────────────────────────────────────────────
 
 const SERVICES = [
   { icon: Wrench,      title: 'General Repairs',     desc: 'Fixing doors, windows, locks, hinges, and all the small jobs that add up fast.' },
@@ -33,12 +39,12 @@ const STEPS = [
 ];
 
 const REVIEWS = [
-  { name: 'Sarah M.',  location: 'Beltline',   rating: 5, text: 'AJ fixed three things in my condo in under two hours. Honest pricing and left the place spotless. Will definitely call again!' },
-  { name: 'Dave R.',   location: 'Tuscany',    rating: 5, text: 'Had a leaky faucet and a broken fence gate. AJ handled both same day. Super professional and reasonably priced.' },
-  { name: 'Linda K.',  location: 'Mahogany',   rating: 5, text: 'Assembled my entire IKEA bedroom set without a single complaint. Fast, friendly, and worth every penny.' },
-  { name: 'James T.',  location: 'Mission',    rating: 5, text: 'Repaired my drywall after a water leak. The patch is completely invisible. Highly recommend AJ to anyone in Calgary!' },
-  { name: 'Priya S.',  location: 'Evanston',   rating: 5, text: 'AJ painted our main floor and the results are stunning. He was tidy, fast, and the colour is exactly what we wanted.' },
-  { name: 'Tom W.',    location: 'Killarney',  rating: 5, text: 'Called on a Friday afternoon about a broken door lock. AJ was there Saturday morning. Amazing response time!' },
+  { name: 'Sarah M.',  location: 'Beltline',  rating: 5, text: 'AJ fixed three things in my condo in under two hours. Honest pricing and left the place spotless. Will definitely call again!' },
+  { name: 'Dave R.',   location: 'Tuscany',   rating: 5, text: 'Had a leaky faucet and a broken fence gate. AJ handled both same day. Super professional and reasonably priced.' },
+  { name: 'Linda K.',  location: 'Mahogany',  rating: 5, text: 'Assembled my entire IKEA bedroom set without a single complaint. Fast, friendly, and worth every penny.' },
+  { name: 'James T.',  location: 'Mission',   rating: 5, text: 'Repaired my drywall after a water leak. The patch is completely invisible. Highly recommend AJ to anyone in Calgary!' },
+  { name: 'Priya S.',  location: 'Evanston',  rating: 5, text: 'AJ painted our main floor and the results are stunning. He was tidy, fast, and the colour is exactly what we wanted.' },
+  { name: 'Tom W.',    location: 'Killarney', rating: 5, text: 'Called on a Friday afternoon about a broken door lock. AJ was there Saturday morning. Amazing response time!' },
 ];
 
 const AREAS = [
@@ -56,19 +62,16 @@ const NAV_LINKS = [
   { href: '#contact',       label: 'Contact' },
 ];
 
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export default function Page() {
   const [menuOpen, setMenuOpen]   = useState(false);
   const [scrolled, setScrolled]   = useState(false);
-  const [parallaxY, setParallaxY] = useState(0);
   const [formData, setFormData]   = useState({ name: '', phone: '', email: '', service: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 60);
-      setParallaxY(window.scrollY * 0.35);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -134,13 +137,16 @@ export default function Page() {
         )}
       </header>
 
-      {/* ── HERO ───────────────────────────────────────────────────────── */}
-      <section ref={heroRef} className="hero-parallax min-h-screen flex items-center justify-center relative overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" style={{ transform: `translateY(${parallaxY * 0.6}px)` }} />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-orange-400/15 blur-3xl pointer-events-none" style={{ transform: `translateY(-${parallaxY * 0.4}px)` }} />
-        <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-blue-300/10 blur-2xl pointer-events-none" style={{ transform: `translateY(${parallaxY * 0.2}px)` }} />
+      {/* ── HERO (WebGL Shader background) ─────────────────────────────── */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Full-screen WebGL shader */}
+        <WebGLShader />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center" style={{ transform: `translateY(${parallaxY * 0.15}px)` }}>
+        {/* Dark overlay so text stays readable */}
+        <div className="absolute inset-0 bg-[#1E3A8A]/60 z-10" />
+
+        {/* Content */}
+        <div className="relative z-20 max-w-4xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 glass-card px-4 py-2 text-orange-300 text-sm font-medium font-opensans mb-6">
             <MapPin size={14} /> Serving Calgary &amp; Surrounding Areas
           </div>
@@ -151,20 +157,31 @@ export default function Page() {
             <span className="text-gradient">Handyman</span> Services
           </h1>
 
-          <p className="text-white/75 text-lg md:text-xl font-opensans max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-white/80 text-lg md:text-xl font-opensans max-w-2xl mx-auto mb-10 leading-relaxed">
             From leaky faucets to full room makeovers — AJ&apos;s Handyman gets the job done right,
             on time, and on budget. No job is too small.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="#contact" className="cta-btn text-white font-bold font-poppins px-8 py-4 rounded-full text-base flex items-center justify-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* Liquid Glass CTA */}
+            <LiquidButton
+              size="xl"
+              className="text-white border border-white/30 rounded-full font-poppins font-bold"
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Get a Free Quote <ArrowRight size={18} />
-            </a>
-            <a href="tel:4031234567" className="glass-card text-white font-semibold font-poppins px-8 py-4 rounded-full text-base flex items-center justify-center gap-2 hover:bg-white/20 transition-colors">
+            </LiquidButton>
+
+            <LiquidButton
+              size="xl"
+              className="text-white border border-white/20 rounded-full font-poppins font-semibold"
+              onClick={() => { window.location.href = 'tel:4031234567'; }}
+            >
               <Phone size={18} /> (403) 123-4567
-            </a>
+            </LiquidButton>
           </div>
 
+          {/* Stats */}
           <div className="mt-16 grid grid-cols-3 gap-6 max-w-lg mx-auto">
             {[{ value: '500+', label: 'Jobs Done' }, { value: '5★', label: 'Avg Rating' }, { value: '10yr', label: 'Experience' }].map(s => (
               <div key={s.label} className="glass-card px-4 py-4 text-center">
@@ -175,15 +192,37 @@ export default function Page() {
           </div>
         </div>
 
-        <a href="#services" className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 hover:text-white/80 animate-bounce transition-colors">
+        <a href="#showcase" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-white/50 hover:text-white/80 animate-bounce transition-colors">
           <ChevronDown size={28} />
         </a>
+      </section>
 
-        <div className="wave-divider">
-          <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-            <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f8fafc" />
-          </svg>
-        </div>
+      {/* ── SCROLL SHOWCASE (ContainerScroll) ──────────────────────────── */}
+      <section id="showcase" className="bg-slate-50 overflow-hidden">
+        <ContainerScroll
+          titleComponent={
+            <div className="mb-6">
+              <span className="text-[#F97316] font-poppins font-semibold text-sm uppercase tracking-widest">
+                Our Work
+              </span>
+              <h2 className="font-poppins font-bold text-[#1E3A8A] text-3xl md:text-5xl mt-3">
+                Craftsmanship You Can See
+              </h2>
+              <p className="text-slate-600 font-opensans mt-3 max-w-xl mx-auto text-lg">
+                Every job is treated with care and attention to detail — from the first nail to the final coat.
+              </p>
+            </div>
+          }
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1400&q=80"
+            alt="Professional handyman at work in a Calgary home"
+            width={1400}
+            height={720}
+            className="mx-auto rounded-2xl object-cover h-full object-center"
+            draggable={false}
+          />
+        </ContainerScroll>
       </section>
 
       {/* ── SERVICES ───────────────────────────────────────────────────── */}
@@ -299,9 +338,7 @@ export default function Page() {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <span className="text-[#F97316] font-poppins font-semibold text-sm uppercase tracking-widest">Coverage</span>
           <h2 className="font-poppins font-bold text-white text-3xl md:text-5xl mt-3 mb-4">Service Areas</h2>
-          <p className="text-white/70 font-opensans max-w-xl mx-auto text-lg mb-12">
-            We cover Calgary and the surrounding communities. Not sure if we reach you? Just call!
-          </p>
+          <p className="text-white/70 font-opensans max-w-xl mx-auto text-lg mb-12">We cover Calgary and the surrounding communities. Not sure if we reach you? Just call!</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {AREAS.map(area => (
               <div key={area} className="glass-card px-4 py-3 flex items-center gap-2">
@@ -328,7 +365,7 @@ export default function Page() {
               <div className="glass-card-light p-8">
                 <h3 className="font-poppins font-bold text-[#1E3A8A] text-xl mb-6">Contact Info</h3>
                 {[
-                  { icon: Phone,  label: 'Phone',    value: '(403) 123-4567',     href: 'tel:4031234567' },
+                  { icon: Phone,  label: 'Phone',    value: '(403) 123-4567',      href: 'tel:4031234567' },
                   { icon: Mail,   label: 'Email',    value: 'aj@ajhandymanyyc.ca', href: 'mailto:aj@ajhandymanyyc.ca' },
                   { icon: MapPin, label: 'Location', value: 'Calgary, AB & Area',  href: '#service-areas' },
                 ].map(({ icon: Icon, label, value, href }) => (
@@ -343,7 +380,6 @@ export default function Page() {
                   </a>
                 ))}
               </div>
-
               <div className="glass-card-light p-6 text-center">
                 <Clock size={28} className="text-[#F97316] mx-auto mb-3" />
                 <h4 className="font-poppins font-semibold text-[#1E3A8A] mb-2">Working Hours</h4>
