@@ -91,13 +91,17 @@ export default function Page() {
         )}
       >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 md:h-20">
-          <a href="#" className="flex items-center gap-2 font-poppins font-bold text-white">
+          {/* Logo */}
+          <a href="#" className="flex items-center gap-2 font-poppins font-bold text-white shrink-0">
             <span className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#F97316]">
               <Hammer size={18} className="text-white" />
             </span>
-            <span className="text-xl">AJ&apos;s <span className="text-[#F97316]">Handyman</span></span>
+            {/* Full name on md+, short "AJ's" on mobile */}
+            <span className="hidden sm:inline text-xl">AJ&apos;s <span className="text-[#F97316]">Handyman</span></span>
+            <span className="sm:hidden text-lg">AJ&apos;s</span>
           </a>
 
+          {/* Desktop nav */}
           <ul className="hidden md:flex items-center gap-6">
             {NAV_LINKS.map(l => (
               <li key={l.href}>
@@ -108,21 +112,35 @@ export default function Page() {
             ))}
           </ul>
 
+          {/* Desktop CTA */}
           <a href="tel:4031234567" className="hidden md:flex items-center gap-2 cta-btn text-white font-semibold font-poppins px-5 py-2.5 rounded-full text-sm">
             <Phone size={15} /> (403) 123-4567
           </a>
 
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-white p-2" aria-label="Toggle menu">
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile: visible shortcut links + hamburger */}
+          <div className="flex md:hidden items-center gap-1">
+            <a href="#" className="text-white/80 hover:text-[#F97316] transition-colors text-xs font-medium font-opensans px-2 py-1">
+              Home
+            </a>
+            <a href="#services" className="text-white/80 hover:text-[#F97316] transition-colors text-xs font-medium font-opensans px-2 py-1">
+              Services
+            </a>
+            <a href="#contact" className="text-[#F97316] font-semibold font-opensans text-xs px-2 py-1">
+              Quote
+            </a>
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-white p-2 ml-1" aria-label="Toggle menu">
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </nav>
 
+        {/* Mobile drawer — remaining links */}
         {menuOpen && (
           <div className="md:hidden bg-[#1E3A8A]/98 backdrop-blur-md border-t border-white/10">
-            <ul className="flex flex-col px-6 py-4 gap-4">
+            <ul className="flex flex-col px-6 py-4 gap-3">
               {NAV_LINKS.map(l => (
                 <li key={l.href}>
-                  <a href={l.href} onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-[#F97316] font-medium font-opensans py-1">
+                  <a href={l.href} onClick={() => setMenuOpen(false)} className="block text-white/90 hover:text-[#F97316] font-medium font-opensans py-1 text-sm">
                     {l.label}
                   </a>
                 </li>
